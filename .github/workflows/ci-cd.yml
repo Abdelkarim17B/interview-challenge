@@ -292,7 +292,6 @@ jobs:
   code-review:
     name: Code Review Automation
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     needs: [code-quality-security, tests]
     steps:
       - name: Checkout code
