@@ -1,0 +1,63 @@
+{
+  "config": {
+    "target": "http://localhost:8080",
+    "phases": [
+      {
+        "duration": 60,
+        "arrivalRate": 5,
+        "name": "Warm up"
+      },
+      {
+        "duration": 120,
+        "arrivalRate": 10,
+        "name": "Load test"
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "name": "API Health Check",
+      "weight": 30,
+      "flow": [
+        {
+          "get": {
+            "url": "/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Patients",
+      "weight": 25,
+      "flow": [
+        {
+          "get": {
+            "url": "/patients"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Medications",
+      "weight": 25,
+      "flow": [
+        {
+          "get": {
+            "url": "/medications"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Assignments",
+      "weight": 20,
+      "flow": [
+        {
+          "get": {
+            "url": "/assignments"
+          }
+        }
+      ]
+    }
+  ]
+}

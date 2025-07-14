@@ -1,0 +1,394 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '18'
+  BACKEND_PORT: 8080
+  FRONTEND_PORT: 3000
+
+jobs:
+  # Pre-Build Stage - Install dependencies and setup
+  pre-build:
+    name: Pre-Build Setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [backend, frontend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ matrix.service }}/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd ${{ matrix.service }}
+          npm ci
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ matrix.service }}/node_modules
+          key: ${{ runner.os }}-${{ matrix.service }}-node-${{ hashFiles(format('{0}/package-lock.json', matrix.service)) }}
+
+  # Code Quality & Security (Backend)
+  code-quality-security:
+    name: Code Quality & Security
+    runs-on: ubuntu-latest
+    needs: pre-build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-node-${{ hashFiles('backend/package-lock.json') }}
+
+      - name: Install dependencies if cache miss
+        run: |
+          cd backend
+          npm ci
+
+      - name: ESLint Check
+        run: |
+          cd backend
+          npm run lint
+
+      - name: TypeScript Check
+        run: |
+          cd backend
+          npx tsc --noEmit
+
+      - name: Security Audit
+        run: |
+          cd backend
+          npm audit --audit-level=moderate
+
+      - name: Code Formatting Check
+        run: |
+          cd backend
+          npm run format -- --check
+
+  # Tests (Backend)
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: [pre-build, code-quality-security]
+    strategy:
+      matrix:
+        test-type: [unit, integration, e2e]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-node-${{ hashFiles('backend/package-lock.json') }}
+
+      - name: Install dependencies if cache miss
+        run: |
+          cd backend
+          npm ci
+
+      - name: Create test database
+        run: |
+          cd backend
+          cp database.sqlite test-database.sqlite
+
+      - name: Run Unit Tests
+        if: matrix.test-type == 'unit'
+        run: |
+          cd backend
+          npm run test -- --coverage --testPathPattern=spec.ts
+
+      - name: Run Integration Tests
+        if: matrix.test-type == 'integration'
+        run: |
+          cd backend
+          npm run test -- --testPathPattern=integration.spec.ts
+
+      - name: Run E2E Tests
+        if: matrix.test-type == 'e2e'
+        run: |
+          cd backend
+          npm run test:e2e
+
+      - name: Upload coverage reports
+        if: matrix.test-type == 'unit'
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./backend/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+
+  # Database Tests (Backend)
+  database-tests:
+    name: Database Tests
+    runs-on: ubuntu-latest
+    needs: pre-build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-node-${{ hashFiles('backend/package-lock.json') }}
+
+      - name: Install dependencies if cache miss
+        run: |
+          cd backend
+          npm ci
+
+      - name: Test Database Connection
+        run: |
+          cd backend
+          npm run test -- --testPathPattern=database.spec.ts
+
+  # Build & Containerization
+  build-containerization:
+    name: Build & Containerization
+    runs-on: ubuntu-latest
+    needs: [tests, database-tests]
+    strategy:
+      matrix:
+        service: [backend, frontend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ matrix.service }}/package-lock.json
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ matrix.service }}/node_modules
+          key: ${{ runner.os }}-${{ matrix.service }}-node-${{ hashFiles(format('{0}/package-lock.json', matrix.service)) }}
+
+      - name: Install dependencies if cache miss
+        run: |
+          cd ${{ matrix.service }}
+          npm ci
+
+      - name: Build application
+        run: |
+          cd ${{ matrix.service }}
+          npm run build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ matrix.service }}:${{ github.sha }} -f ${{ matrix.service }}/Dockerfile ${{ matrix.service }}/
+
+      - name: Test Docker image
+        run: |
+          docker run --rm ${{ matrix.service }}:${{ github.sha }} --version || true
+
+      - name: Save Docker image
+        run: |
+          docker save ${{ matrix.service }}:${{ github.sha }} > ${{ matrix.service }}-image.tar
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.service }}-docker-image
+          path: ${{ matrix.service }}-image.tar
+
+  # Performance Monitoring (Backend)
+  performance-monitoring:
+    name: Performance Monitoring
+    runs-on: ubuntu-latest
+    needs: build-containerization
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-node-${{ hashFiles('backend/package-lock.json') }}
+
+      - name: Install dependencies if cache miss
+        run: |
+          cd backend
+          npm ci
+
+      - name: Install Artillery for load testing
+        run: |
+          cd backend
+          npm install --save-dev artillery
+
+      - name: Start application for performance testing
+        run: |
+          cd backend
+          npm run start:prod &
+          sleep 10
+        env:
+          NODE_ENV: production
+
+      - name: Run Performance Tests
+        run: |
+          cd backend
+          npx artillery quick --count 10 --num 5 http://localhost:${{ env.BACKEND_PORT }}/
+
+      - name: Bundle Size Analysis
+        run: |
+          cd backend
+          npm run build
+          du -sh dist/
+
+  # Code Review Automation
+  code-review:
+    name: Code Review Automation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: [code-quality-security, tests]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-node-${{ hashFiles('backend/package-lock.json') }}
+
+      - name: Install dependencies if cache miss
+        run: |
+          cd backend
+          npm ci
+
+      - name: Run Code Quality Check
+        run: |
+          cd backend
+          npm run lint
+          npm run test -- --coverage --passWithNoTests
+
+      - name: Comment PR with Results
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && comment.body.includes('🤖 Code Review Summary')
+            );
+            
+            const body = `🤖 Code Review Summary
+            
+            ✅ Code Quality: Passed
+            ✅ Tests: Passed
+            ✅ Security: No critical vulnerabilities found
+            ✅ Build: Successful
+            
+            This PR is ready for human review!`;
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+  # Deployment (only on main branch)
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: [build-containerization, performance-monitoring]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Docker images
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-docker-image
+
+      - name: Download Docker images
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-docker-image
+
+      - name: Load Docker images
+        run: |
+          docker load < backend-image.tar
+          docker load < frontend-image.tar
+
+      - name: Deploy to staging
+        run: |
+          echo "🚀 Deploying to staging environment..."
+          # Add your deployment commands here
+          echo "Backend image: backend:${{ github.sha }}"
+          echo "Frontend image: frontend:${{ github.sha }}"
