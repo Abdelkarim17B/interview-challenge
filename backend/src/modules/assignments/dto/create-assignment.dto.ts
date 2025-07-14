@@ -1,4 +1,10 @@
-import { IsDateString, IsNotEmpty, IsNumber, IsPositive, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  Min,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAssignmentDto {

@@ -19,7 +19,7 @@ export class AssignmentsService {
   async create(createAssignmentDto: CreateAssignmentDto): Promise<Assignment> {
     // Validate patient exists
     await this.patientsService.findOne(createAssignmentDto.patientId);
-    
+
     // Validate medication exists
     await this.medicationsService.findOne(createAssignmentDto.medicationId);
 
@@ -51,7 +51,10 @@ export class AssignmentsService {
     return assignment;
   }
 
-  async update(id: number, updateAssignmentDto: UpdateAssignmentDto): Promise<Assignment> {
+  async update(
+    id: number,
+    updateAssignmentDto: UpdateAssignmentDto,
+  ): Promise<Assignment> {
     const assignment = await this.findOne(id);
 
     // Validate patient exists if patientId is being updated
@@ -66,7 +69,9 @@ export class AssignmentsService {
 
     const updateData = {
       ...updateAssignmentDto,
-      ...(updateAssignmentDto.startDate && { startDate: new Date(updateAssignmentDto.startDate) }),
+      ...(updateAssignmentDto.startDate && {
+        startDate: new Date(updateAssignmentDto.startDate),
+      }),
     };
 
     Object.assign(assignment, updateData);
@@ -87,40 +92,50 @@ export class AssignmentsService {
   calculateRemainingDays(startDate: Date, days: number): number {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
-    
+
     const start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
-    
+
     const endDate = new Date(start);
     endDate.setDate(endDate.getDate() + days);
-    
+
     const diffTime = endDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     return Math.max(0, diffDays);
   }
 
   /**
    * Get all assignments with calculated remaining days
    */
-  async findAllWithRemainingDays(): Promise<(Assignment & { remainingDays: number })[]> {
+  async findAllWithRemainingDays(): Promise<
+    (Assignment & { remainingDays: number })[]
+  > {
     const assignments = await this.findAll();
-    
-    return assignments.map(assignment => ({
+
+    return assignments.map((assignment) => ({
       ...assignment,
-      remainingDays: this.calculateRemainingDays(assignment.startDate, assignment.days),
+      remainingDays: this.calculateRemainingDays(
+        assignment.startDate,
+        assignment.days,
+      ),
     }));
   }
 
   /**
    * Get assignment by ID with calculated remaining days
    */
-  async findOneWithRemainingDays(id: number): Promise<Assignment & { remainingDays: number }> {
+  async findOneWithRemainingDays(
+    id: number,
+  ): Promise<Assignment & { remainingDays: number }> {
     const assignment = await this.findOne(id);
-    
+
     return {
       ...assignment,
-      remainingDays: this.calculateRemainingDays(assignment.startDate, assignment.days),
+      remainingDays: this.calculateRemainingDays(
+        assignment.startDate,
+        assignment.days,
+      ),
     };
   }
 }

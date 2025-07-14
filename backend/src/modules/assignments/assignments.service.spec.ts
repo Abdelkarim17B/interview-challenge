@@ -105,11 +105,11 @@ describe('AssignmentsService', () => {
       };
 
       mockPatientsService.findOne.mockRejectedValue(
-        new NotFoundException('Patient with ID 999 not found')
+        new NotFoundException('Patient with ID 999 not found'),
       );
 
       await expect(service.create(createAssignmentDto)).rejects.toThrow(
-        new NotFoundException('Patient with ID 999 not found')
+        new NotFoundException('Patient with ID 999 not found'),
       );
     });
 
@@ -125,11 +125,11 @@ describe('AssignmentsService', () => {
 
       mockPatientsService.findOne.mockResolvedValue(mockPatient);
       mockMedicationsService.findOne.mockRejectedValue(
-        new NotFoundException('Medication with ID 999 not found')
+        new NotFoundException('Medication with ID 999 not found'),
       );
 
       await expect(service.create(createAssignmentDto)).rejects.toThrow(
-        new NotFoundException('Medication with ID 999 not found')
+        new NotFoundException('Medication with ID 999 not found'),
       );
     });
   });
@@ -183,7 +183,7 @@ describe('AssignmentsService', () => {
       mockAssignmentsRepository.findOne.mockResolvedValue(null);
 
       await expect(service.findOne(999)).rejects.toThrow(
-        new NotFoundException('Assignment with ID 999 not found')
+        new NotFoundException('Assignment with ID 999 not found'),
       );
     });
   });
@@ -211,7 +211,9 @@ describe('AssignmentsService', () => {
 
       const result = await service.update(1, updateAssignmentDto);
 
-      expect(mockAssignmentsRepository.save).toHaveBeenCalledWith(updatedAssignment);
+      expect(mockAssignmentsRepository.save).toHaveBeenCalledWith(
+        updatedAssignment,
+      );
       expect(result).toEqual(updatedAssignment);
     });
 
@@ -279,7 +281,9 @@ describe('AssignmentsService', () => {
 
       await service.remove(1);
 
-      expect(mockAssignmentsRepository.remove).toHaveBeenCalledWith(mockAssignment);
+      expect(mockAssignmentsRepository.remove).toHaveBeenCalledWith(
+        mockAssignment,
+      );
     });
   });
 

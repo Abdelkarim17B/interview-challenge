@@ -1,22 +1,22 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
-  Delete, 
-  HttpCode, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
   HttpStatus,
   ParseIntPipe,
   ValidationPipe,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiParam, 
-  ApiBody 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
 } from '@nestjs/swagger';
 import { PatientsService } from './patients.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
@@ -32,15 +32,25 @@ export class PatientsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new patient' })
   @ApiBody({ type: CreatePatientDto })
-  @ApiResponse({ status: 201, description: 'Patient created successfully', type: Patient })
+  @ApiResponse({
+    status: 201,
+    description: 'Patient created successfully',
+    type: Patient,
+  })
   @ApiResponse({ status: 400, description: 'Bad request - validation failed' })
-  async create(@Body(ValidationPipe) createPatientDto: CreatePatientDto): Promise<Patient> {
+  async create(
+    @Body(ValidationPipe) createPatientDto: CreatePatientDto,
+  ): Promise<Patient> {
     return await this.patientsService.create(createPatientDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all patients' })
-  @ApiResponse({ status: 200, description: 'List of patients with their assignments', type: [Patient] })
+  @ApiResponse({
+    status: 200,
+    description: 'List of patients with their assignments',
+    type: [Patient],
+  })
   async findAll(): Promise<Patient[]> {
     return await this.patientsService.findAll();
   }
@@ -58,12 +68,16 @@ export class PatientsController {
   @ApiOperation({ summary: 'Update a patient' })
   @ApiParam({ name: 'id', description: 'Patient ID' })
   @ApiBody({ type: UpdatePatientDto })
-  @ApiResponse({ status: 200, description: 'Patient updated successfully', type: Patient })
+  @ApiResponse({
+    status: 200,
+    description: 'Patient updated successfully',
+    type: Patient,
+  })
   @ApiResponse({ status: 404, description: 'Patient not found' })
   @ApiResponse({ status: 400, description: 'Bad request - validation failed' })
   async update(
-    @Param('id', ParseIntPipe) id: number, 
-    @Body(ValidationPipe) updatePatientDto: UpdatePatientDto
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) updatePatientDto: UpdatePatientDto,
   ): Promise<Patient> {
     return await this.patientsService.update(id, updatePatientDto);
   }

@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Assignment } from '../assignments/assignment.entity';
 
 @Entity('medications')
@@ -15,7 +22,7 @@ export class Medication {
   @Column({ type: 'varchar', length: 50 })
   frequency: string;
 
-  @OneToMany(() => Assignment, assignment => assignment.medication)
+  @OneToMany(() => Assignment, (assignment) => assignment.medication)
   assignments: Assignment[];
 
   @CreateDateColumn()

@@ -22,9 +22,7 @@ describe('Integration Tests', () => {
 
   describe('Patients API', () => {
     it('/patients (GET)', () => {
-      return request(app.getHttpServer())
-        .get('/patients')
-        .expect(200);
+      return request(app.getHttpServer()).get('/patients').expect(200);
     });
 
     it('/patients (POST)', () => {
@@ -40,9 +38,7 @@ describe('Integration Tests', () => {
 
   describe('Medications API', () => {
     it('/medications (GET)', () => {
-      return request(app.getHttpServer())
-        .get('/medications')
-        .expect(200);
+      return request(app.getHttpServer()).get('/medications').expect(200);
     });
 
     it('/medications (POST)', () => {
@@ -59,9 +55,7 @@ describe('Integration Tests', () => {
 
   describe('Assignments API', () => {
     it('/assignments (GET)', () => {
-      return request(app.getHttpServer())
-        .get('/assignments')
-        .expect(200);
+      return request(app.getHttpServer()).get('/assignments').expect(200);
     });
   });
 });

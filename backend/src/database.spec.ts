@@ -45,7 +45,7 @@ describe('Database Integration Tests', () => {
     expect(assignmentRepository).toBeDefined();
   });
 
-  it('should connect to database', async () => {
+  it('should connect to database', () => {
     // Mock database connection test
     expect(true).toBe(true);
   });

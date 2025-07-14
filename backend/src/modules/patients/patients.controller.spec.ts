@@ -7,7 +7,6 @@ import { UpdatePatientDto } from './dto/update-patient.dto';
 
 describe('PatientsController', () => {
   let controller: PatientsController;
-  let service: PatientsService;
 
   const mockPatientsService = {
     create: jest.fn(),
@@ -29,7 +28,6 @@ describe('PatientsController', () => {
     }).compile();
 
     controller = module.get<PatientsController>(PatientsController);
-    service = module.get<PatientsService>(PatientsService);
   });
 
   afterEach(() => {
@@ -60,7 +58,7 @@ describe('PatientsController', () => {
 
       const result = await controller.create(createPatientDto);
 
-      expect(service.create).toHaveBeenCalledWith(createPatientDto);
+      expect(mockPatientsService.create).toHaveBeenCalledWith(createPatientDto);
       expect(result).toEqual(mockPatient);
     });
 
@@ -72,7 +70,9 @@ describe('PatientsController', () => {
 
       mockPatientsService.create.mockRejectedValue(new Error('Service error'));
 
-      await expect(controller.create(createPatientDto)).rejects.toThrow('Service error');
+      await expect(controller.create(createPatientDto)).rejects.toThrow(
+        'Service error',
+      );
     });
   });
 
@@ -95,7 +95,7 @@ describe('PatientsController', () => {
 
       const result = await controller.findAll();
 
-      expect(service.findAll).toHaveBeenCalled();
+      expect(mockPatientsService.findAll).toHaveBeenCalled();
       expect(result).toEqual(mockPatients);
     });
 
@@ -120,17 +120,17 @@ describe('PatientsController', () => {
 
       const result = await controller.findOne(1);
 
-      expect(service.findOne).toHaveBeenCalledWith(1);
+      expect(mockPatientsService.findOne).toHaveBeenCalledWith(1);
       expect(result).toEqual(mockPatient);
     });
 
     it('should throw NotFoundException when patient not found', async () => {
       mockPatientsService.findOne.mockRejectedValue(
-        new NotFoundException('Patient with ID 999 not found')
+        new NotFoundException('Patient with ID 999 not found'),
       );
 
       await expect(controller.findOne(999)).rejects.toThrow(
-        new NotFoundException('Patient with ID 999 not found')
+        new NotFoundException('Patient with ID 999 not found'),
       );
     });
   });
@@ -152,7 +152,10 @@ describe('PatientsController', () => {
 
       const result = await controller.update(1, updatePatientDto);
 
-      expect(service.update).toHaveBeenCalledWith(1, updatePatientDto);
+      expect(mockPatientsService.update).toHaveBeenCalledWith(
+        1,
+        updatePatientDto,
+      );
       expect(result).toEqual(updatedPatient);
     });
 
@@ -162,11 +165,11 @@ describe('PatientsController', () => {
       };
 
       mockPatientsService.update.mockRejectedValue(
-        new NotFoundException('Patient with ID 999 not found')
+        new NotFoundException('Patient with ID 999 not found'),
       );
 
       await expect(controller.update(999, updatePatientDto)).rejects.toThrow(
-        new NotFoundException('Patient with ID 999 not found')
+        new NotFoundException('Patient with ID 999 not found'),
       );
     });
   });
@@ -177,16 +180,16 @@ describe('PatientsController', () => {
 
       await controller.remove(1);
 
-      expect(service.remove).toHaveBeenCalledWith(1);
+      expect(mockPatientsService.remove).toHaveBeenCalledWith(1);
     });
 
     it('should throw NotFoundException when patient not found', async () => {
       mockPatientsService.remove.mockRejectedValue(
-        new NotFoundException('Patient with ID 999 not found')
+        new NotFoundException('Patient with ID 999 not found'),
       );
 
       await expect(controller.remove(999)).rejects.toThrow(
-        new NotFoundException('Patient with ID 999 not found')
+        new NotFoundException('Patient with ID 999 not found'),
       );
     });
   });

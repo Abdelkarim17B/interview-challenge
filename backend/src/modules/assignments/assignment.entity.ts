@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Patient } from '../patients/patient.entity';
 import { Medication } from '../medications/medication.entity';
 
@@ -19,11 +27,11 @@ export class Assignment {
   @Column({ type: 'integer' })
   medicationId: number;
 
-  @ManyToOne(() => Patient, patient => patient.assignments)
+  @ManyToOne(() => Patient, (patient) => patient.assignments)
   @JoinColumn({ name: 'patientId' })
   patient: Patient;
 
-  @ManyToOne(() => Medication, medication => medication.assignments)
+  @ManyToOne(() => Medication, (medication) => medication.assignments)
   @JoinColumn({ name: 'medicationId' })
   medication: Medication;
 

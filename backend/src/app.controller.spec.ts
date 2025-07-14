@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 
 describe('AppController', () => {
   let appController: AppController;
-  let appService: AppService;
 
   const mockAppService = {
     getHello: jest.fn(),
@@ -22,7 +21,6 @@ describe('AppController', () => {
     }).compile();
 
     appController = app.get<AppController>(AppController);
-    appService = app.get<AppService>(AppService);
   });
 
   afterEach(() => {
@@ -39,7 +37,7 @@ describe('AppController', () => {
 
       const result = appController.getHello();
 
-      expect(appService.getHello).toHaveBeenCalled();
+      expect(mockAppService.getHello).toHaveBeenCalled();
       expect(result).toBe('Hello Oxyera!');
     });
   });
@@ -47,10 +45,14 @@ describe('AppController', () => {
   describe('getHealth', () => {
     it('should return health status object', () => {
       const mockDate = new Date('2024-01-01T00:00:00.000Z');
-      jest.spyOn(global, 'Date').mockImplementation(() => mockDate as any);
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
       jest.spyOn(process, 'uptime').mockReturnValue(123.456);
 
-      const result = appController.getHealth();
+      const result = appController.getHealth() as {
+        status: string;
+        timestamp: string;
+        uptime: number;
+      };
 
       expect(result).toEqual({
         status: 'ok',
@@ -64,8 +66,14 @@ describe('AppController', () => {
     it('should return different timestamps for different calls', () => {
       jest.spyOn(process, 'uptime').mockReturnValue(100);
 
-      const result1 = appController.getHealth() as any;
-      const result2 = appController.getHealth() as any;
+      const result1 = appController.getHealth() as {
+        status: string;
+        uptime: number;
+      };
+      const result2 = appController.getHealth() as {
+        status: string;
+        uptime: number;
+      };
 
       expect(result1.status).toBe('ok');
       expect(result2.status).toBe('ok');

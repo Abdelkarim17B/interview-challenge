@@ -7,7 +7,6 @@ import { UpdateMedicationDto } from './dto/update-medication.dto';
 
 describe('MedicationsController', () => {
   let controller: MedicationsController;
-  let service: MedicationsService;
 
   const mockMedicationsService = {
     create: jest.fn(),
@@ -29,7 +28,6 @@ describe('MedicationsController', () => {
     }).compile();
 
     controller = module.get<MedicationsController>(MedicationsController);
-    service = module.get<MedicationsService>(MedicationsService);
   });
 
   afterEach(() => {
@@ -62,7 +60,9 @@ describe('MedicationsController', () => {
 
       const result = await controller.create(createMedicationDto);
 
-      expect(service.create).toHaveBeenCalledWith(createMedicationDto);
+      expect(mockMedicationsService.create).toHaveBeenCalledWith(
+        createMedicationDto,
+      );
       expect(result).toEqual(mockMedication);
     });
 
@@ -73,9 +73,13 @@ describe('MedicationsController', () => {
         frequency: 'Once daily',
       };
 
-      mockMedicationsService.create.mockRejectedValue(new Error('Service error'));
+      mockMedicationsService.create.mockRejectedValue(
+        new Error('Service error'),
+      );
 
-      await expect(controller.create(createMedicationDto)).rejects.toThrow('Service error');
+      await expect(controller.create(createMedicationDto)).rejects.toThrow(
+        'Service error',
+      );
     });
   });
 
@@ -98,7 +102,7 @@ describe('MedicationsController', () => {
 
       const result = await controller.findAll();
 
-      expect(service.findAll).toHaveBeenCalled();
+      expect(mockMedicationsService.findAll).toHaveBeenCalled();
       expect(result).toEqual(mockMedications);
     });
 
@@ -123,17 +127,17 @@ describe('MedicationsController', () => {
 
       const result = await controller.findOne(1);
 
-      expect(service.findOne).toHaveBeenCalledWith(1);
+      expect(mockMedicationsService.findOne).toHaveBeenCalledWith(1);
       expect(result).toEqual(mockMedication);
     });
 
     it('should throw NotFoundException when medication not found', async () => {
       mockMedicationsService.findOne.mockRejectedValue(
-        new NotFoundException('Medication with ID 999 not found')
+        new NotFoundException('Medication with ID 999 not found'),
       );
 
       await expect(controller.findOne(999)).rejects.toThrow(
-        new NotFoundException('Medication with ID 999 not found')
+        new NotFoundException('Medication with ID 999 not found'),
       );
     });
   });
@@ -157,7 +161,10 @@ describe('MedicationsController', () => {
 
       const result = await controller.update(1, updateMedicationDto);
 
-      expect(service.update).toHaveBeenCalledWith(1, updateMedicationDto);
+      expect(mockMedicationsService.update).toHaveBeenCalledWith(
+        1,
+        updateMedicationDto,
+      );
       expect(result).toEqual(updatedMedication);
     });
 
@@ -167,11 +174,11 @@ describe('MedicationsController', () => {
       };
 
       mockMedicationsService.update.mockRejectedValue(
-        new NotFoundException('Medication with ID 999 not found')
+        new NotFoundException('Medication with ID 999 not found'),
       );
 
       await expect(controller.update(999, updateMedicationDto)).rejects.toThrow(
-        new NotFoundException('Medication with ID 999 not found')
+        new NotFoundException('Medication with ID 999 not found'),
       );
     });
   });
@@ -182,16 +189,16 @@ describe('MedicationsController', () => {
 
       await controller.remove(1);
 
-      expect(service.remove).toHaveBeenCalledWith(1);
+      expect(mockMedicationsService.remove).toHaveBeenCalledWith(1);
     });
 
     it('should throw NotFoundException when medication not found', async () => {
       mockMedicationsService.remove.mockRejectedValue(
-        new NotFoundException('Medication with ID 999 not found')
+        new NotFoundException('Medication with ID 999 not found'),
       );
 
       await expect(controller.remove(999)).rejects.toThrow(
-        new NotFoundException('Medication with ID 999 not found')
+        new NotFoundException('Medication with ID 999 not found'),
       );
     });
   });

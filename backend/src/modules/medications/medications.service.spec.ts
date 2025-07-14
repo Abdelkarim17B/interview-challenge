@@ -70,8 +70,12 @@ describe('MedicationsService', () => {
 
       const result = await service.create(createMedicationDto);
 
-      expect(mockMedicationsRepository.create).toHaveBeenCalledWith(createMedicationDto);
-      expect(mockMedicationsRepository.save).toHaveBeenCalledWith(mockMedication);
+      expect(mockMedicationsRepository.create).toHaveBeenCalledWith(
+        createMedicationDto,
+      );
+      expect(mockMedicationsRepository.save).toHaveBeenCalledWith(
+        mockMedication,
+      );
       expect(result).toEqual(mockMedication);
     });
 
@@ -83,9 +87,13 @@ describe('MedicationsService', () => {
       };
 
       mockMedicationsRepository.create.mockReturnValue({});
-      mockMedicationsRepository.save.mockRejectedValue(new Error('Database error'));
+      mockMedicationsRepository.save.mockRejectedValue(
+        new Error('Database error'),
+      );
 
-      await expect(service.create(createMedicationDto)).rejects.toThrow('Database error');
+      await expect(service.create(createMedicationDto)).rejects.toThrow(
+        'Database error',
+      );
     });
   });
 
@@ -147,7 +155,7 @@ describe('MedicationsService', () => {
       mockMedicationsRepository.findOne.mockResolvedValue(null);
 
       await expect(service.findOne(999)).rejects.toThrow(
-        new NotFoundException('Medication with ID 999 not found')
+        new NotFoundException('Medication with ID 999 not found'),
       );
     });
   });
@@ -177,7 +185,9 @@ describe('MedicationsService', () => {
 
       const result = await service.update(1, updateMedicationDto);
 
-      expect(mockMedicationsRepository.save).toHaveBeenCalledWith(updatedMedication);
+      expect(mockMedicationsRepository.save).toHaveBeenCalledWith(
+        updatedMedication,
+      );
       expect(result).toEqual(updatedMedication);
     });
 
@@ -185,7 +195,7 @@ describe('MedicationsService', () => {
       mockMedicationsRepository.findOne.mockResolvedValue(null);
 
       await expect(service.update(999, {})).rejects.toThrow(
-        new NotFoundException('Medication with ID 999 not found')
+        new NotFoundException('Medication with ID 999 not found'),
       );
     });
   });
@@ -203,15 +213,19 @@ describe('MedicationsService', () => {
 
       await service.remove(1);
 
-      expect(mockAssignmentsRepository.delete).toHaveBeenCalledWith({ medicationId: 1 });
-      expect(mockMedicationsRepository.remove).toHaveBeenCalledWith(mockMedication);
+      expect(mockAssignmentsRepository.delete).toHaveBeenCalledWith({
+        medicationId: 1,
+      });
+      expect(mockMedicationsRepository.remove).toHaveBeenCalledWith(
+        mockMedication,
+      );
     });
 
     it('should throw NotFoundException when medication not found', async () => {
       mockMedicationsRepository.findOne.mockResolvedValue(null);
 
       await expect(service.remove(999)).rejects.toThrow(
-        new NotFoundException('Medication with ID 999 not found')
+        new NotFoundException('Medication with ID 999 not found'),
       );
     });
   });

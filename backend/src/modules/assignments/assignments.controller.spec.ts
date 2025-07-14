@@ -7,7 +7,6 @@ import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 
 describe('AssignmentsController', () => {
   let controller: AssignmentsController;
-  let service: AssignmentsService;
 
   const mockAssignmentsService = {
     create: jest.fn(),
@@ -31,7 +30,6 @@ describe('AssignmentsController', () => {
     }).compile();
 
     controller = module.get<AssignmentsController>(AssignmentsController);
-    service = module.get<AssignmentsService>(AssignmentsService);
   });
 
   afterEach(() => {
@@ -65,7 +63,9 @@ describe('AssignmentsController', () => {
 
       const result = await controller.create(createAssignmentDto);
 
-      expect(service.create).toHaveBeenCalledWith(createAssignmentDto);
+      expect(mockAssignmentsService.create).toHaveBeenCalledWith(
+        createAssignmentDto,
+      );
       expect(result).toEqual(mockAssignment);
     });
 
@@ -77,9 +77,13 @@ describe('AssignmentsController', () => {
         days: 30,
       };
 
-      mockAssignmentsService.create.mockRejectedValue(new Error('Service error'));
+      mockAssignmentsService.create.mockRejectedValue(
+        new Error('Service error'),
+      );
 
-      await expect(controller.create(createAssignmentDto)).rejects.toThrow('Service error');
+      await expect(controller.create(createAssignmentDto)).rejects.toThrow(
+        'Service error',
+      );
     });
   });
 
@@ -99,7 +103,7 @@ describe('AssignmentsController', () => {
 
       const result = await controller.findAll();
 
-      expect(service.findAll).toHaveBeenCalled();
+      expect(mockAssignmentsService.findAll).toHaveBeenCalled();
       expect(result).toEqual(mockAssignments);
     });
 
@@ -123,11 +127,15 @@ describe('AssignmentsController', () => {
         },
       ];
 
-      mockAssignmentsService.findAllWithRemainingDays.mockResolvedValue(mockAssignments);
+      mockAssignmentsService.findAllWithRemainingDays.mockResolvedValue(
+        mockAssignments,
+      );
 
       const result = await controller.findAllWithRemainingDays();
 
-      expect(service.findAllWithRemainingDays).toHaveBeenCalled();
+      expect(
+        mockAssignmentsService.findAllWithRemainingDays,
+      ).toHaveBeenCalled();
       expect(result).toEqual(mockAssignments);
     });
   });
@@ -146,17 +154,17 @@ describe('AssignmentsController', () => {
 
       const result = await controller.findOne(1);
 
-      expect(service.findOne).toHaveBeenCalledWith(1);
+      expect(mockAssignmentsService.findOne).toHaveBeenCalledWith(1);
       expect(result).toEqual(mockAssignment);
     });
 
     it('should throw NotFoundException when assignment not found', async () => {
       mockAssignmentsService.findOne.mockRejectedValue(
-        new NotFoundException('Assignment with ID 999 not found')
+        new NotFoundException('Assignment with ID 999 not found'),
       );
 
       await expect(controller.findOne(999)).rejects.toThrow(
-        new NotFoundException('Assignment with ID 999 not found')
+        new NotFoundException('Assignment with ID 999 not found'),
       );
     });
   });
@@ -170,11 +178,15 @@ describe('AssignmentsController', () => {
         remainingDays: 25,
       };
 
-      mockAssignmentsService.findOneWithRemainingDays.mockResolvedValue(mockAssignment);
+      mockAssignmentsService.findOneWithRemainingDays.mockResolvedValue(
+        mockAssignment,
+      );
 
       const result = await controller.findOneWithRemainingDays(1);
 
-      expect(service.findOneWithRemainingDays).toHaveBeenCalledWith(1);
+      expect(
+        mockAssignmentsService.findOneWithRemainingDays,
+      ).toHaveBeenCalledWith(1);
       expect(result).toEqual(mockAssignment);
     });
   });
@@ -196,7 +208,10 @@ describe('AssignmentsController', () => {
 
       const result = await controller.update(1, updateAssignmentDto);
 
-      expect(service.update).toHaveBeenCalledWith(1, updateAssignmentDto);
+      expect(mockAssignmentsService.update).toHaveBeenCalledWith(
+        1,
+        updateAssignmentDto,
+      );
       expect(result).toEqual(updatedAssignment);
     });
 
@@ -206,11 +221,11 @@ describe('AssignmentsController', () => {
       };
 
       mockAssignmentsService.update.mockRejectedValue(
-        new NotFoundException('Assignment with ID 999 not found')
+        new NotFoundException('Assignment with ID 999 not found'),
       );
 
       await expect(controller.update(999, updateAssignmentDto)).rejects.toThrow(
-        new NotFoundException('Assignment with ID 999 not found')
+        new NotFoundException('Assignment with ID 999 not found'),
       );
     });
   });
@@ -221,16 +236,16 @@ describe('AssignmentsController', () => {
 
       await controller.remove(1);
 
-      expect(service.remove).toHaveBeenCalledWith(1);
+      expect(mockAssignmentsService.remove).toHaveBeenCalledWith(1);
     });
 
     it('should throw NotFoundException when assignment not found', async () => {
       mockAssignmentsService.remove.mockRejectedValue(
-        new NotFoundException('Assignment with ID 999 not found')
+        new NotFoundException('Assignment with ID 999 not found'),
       );
 
       await expect(controller.remove(999)).rejects.toThrow(
-        new NotFoundException('Assignment with ID 999 not found')
+        new NotFoundException('Assignment with ID 999 not found'),
       );
     });
   });

@@ -83,9 +83,13 @@ describe('PatientsService', () => {
       };
 
       mockPatientsRepository.create.mockReturnValue({});
-      mockPatientsRepository.save.mockRejectedValue(new Error('Database error'));
+      mockPatientsRepository.save.mockRejectedValue(
+        new Error('Database error'),
+      );
 
-      await expect(service.create(createPatientDto)).rejects.toThrow('Database error');
+      await expect(service.create(createPatientDto)).rejects.toThrow(
+        'Database error',
+      );
     });
   });
 
@@ -147,7 +151,7 @@ describe('PatientsService', () => {
       mockPatientsRepository.findOne.mockResolvedValue(null);
 
       await expect(service.findOne(999)).rejects.toThrow(
-        new NotFoundException('Patient with ID 999 not found')
+        new NotFoundException('Patient with ID 999 not found'),
       );
     });
   });
@@ -207,7 +211,7 @@ describe('PatientsService', () => {
       mockPatientsRepository.findOne.mockResolvedValue(null);
 
       await expect(service.update(999, {})).rejects.toThrow(
-        new NotFoundException('Patient with ID 999 not found')
+        new NotFoundException('Patient with ID 999 not found'),
       );
     });
   });
@@ -225,7 +229,9 @@ describe('PatientsService', () => {
 
       await service.remove(1);
 
-      expect(mockAssignmentsRepository.delete).toHaveBeenCalledWith({ patientId: 1 });
+      expect(mockAssignmentsRepository.delete).toHaveBeenCalledWith({
+        patientId: 1,
+      });
       expect(mockPatientsRepository.remove).toHaveBeenCalledWith(mockPatient);
     });
 
@@ -233,7 +239,7 @@ describe('PatientsService', () => {
       mockPatientsRepository.findOne.mockResolvedValue(null);
 
       await expect(service.remove(999)).rejects.toThrow(
-        new NotFoundException('Patient with ID 999 not found')
+        new NotFoundException('Patient with ID 999 not found'),
       );
     });
   });
