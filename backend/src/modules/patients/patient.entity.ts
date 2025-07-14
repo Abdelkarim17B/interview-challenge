@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Assignment } from '../assignments/assignment.entity';
 
 @Entity('patients')
@@ -12,7 +19,7 @@ export class Patient {
   @Column({ type: 'date' })
   dateOfBirth: Date;
 
-  @OneToMany(() => Assignment, assignment => assignment.patient)
+  @OneToMany(() => Assignment, (assignment) => assignment.patient)
   assignments: Assignment[];
 
   @CreateDateColumn()

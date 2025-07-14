@@ -15,11 +15,13 @@ async function bootstrap() {
   });
 
   // Global validation pipe
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Global exception filter
   app.useGlobalFilters(new GlobalExceptionFilter());
@@ -30,7 +32,9 @@ async function bootstrap() {
   // Swagger
   const config = new DocumentBuilder()
     .setTitle('Oxyera Medication Tracker API')
-    .setDescription('API for managing patients, medications, and treatment assignments')
+    .setDescription(
+      'API for managing patients, medications, and treatment assignments',
+    )
     .setVersion('1.0')
     .addTag('Patients', 'Operations related to patients')
     .addTag('Medications', 'Operations related to medications')
@@ -41,7 +45,11 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document);
 
   await app.listen(process.env.PORT ?? 8080);
-  console.log(`Application is running on: http://localhost:${process.env.PORT ?? 8080}`);
-  console.log(`Swagger documentation available at: http://localhost:${process.env.PORT ?? 8080}/api-docs`);
+  console.log(
+    `Application is running on: http://localhost:${process.env.PORT ?? 8080}`,
+  );
+  console.log(
+    `Swagger documentation available at: http://localhost:${process.env.PORT ?? 8080}/api-docs`,
+  );
 }
-bootstrap();
+void bootstrap();

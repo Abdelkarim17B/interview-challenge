@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { assignmentsApi } from '../lib/api';
-import type { Assignment, AssignmentWithRemainingDays } from '../types';
+import type { AssignmentWithRemainingDays } from '../types';
 
 export const useAssignments = () => {
   const [assignments, setAssignments] = useState<AssignmentWithRemainingDays[]>([]);

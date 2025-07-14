@@ -40,7 +40,10 @@ export class MedicationsService {
     return medication;
   }
 
-  async update(id: number, updateMedicationDto: UpdateMedicationDto): Promise<Medication> {
+  async update(
+    id: number,
+    updateMedicationDto: UpdateMedicationDto,
+  ): Promise<Medication> {
     const medication = await this.findOne(id);
     Object.assign(medication, updateMedicationDto);
     return await this.medicationsRepository.save(medication);
@@ -48,10 +51,10 @@ export class MedicationsService {
 
   async remove(id: number): Promise<void> {
     const medication = await this.findOne(id);
-    
+
     // First, delete all related assignments
     await this.assignmentsRepository.delete({ medicationId: id });
-    
+
     // Then delete the medication
     await this.medicationsRepository.remove(medication);
   }

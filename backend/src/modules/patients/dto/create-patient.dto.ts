@@ -2,7 +2,11 @@ import { IsString, IsNotEmpty, IsDateString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePatientDto {
-  @ApiProperty({ description: 'Patient name', example: 'John Doe', maxLength: 100 })
+  @ApiProperty({
+    description: 'Patient name',
+    example: 'John Doe',
+    maxLength: 100,
+  })
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)

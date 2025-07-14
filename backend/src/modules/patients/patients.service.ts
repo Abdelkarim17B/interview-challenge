@@ -43,12 +43,17 @@ export class PatientsService {
     return patient;
   }
 
-  async update(id: number, updatePatientDto: UpdatePatientDto): Promise<Patient> {
+  async update(
+    id: number,
+    updatePatientDto: UpdatePatientDto,
+  ): Promise<Patient> {
     const patient = await this.findOne(id);
-    
+
     const updateData = {
       ...updatePatientDto,
-      ...(updatePatientDto.dateOfBirth && { dateOfBirth: new Date(updatePatientDto.dateOfBirth) }),
+      ...(updatePatientDto.dateOfBirth && {
+        dateOfBirth: new Date(updatePatientDto.dateOfBirth),
+      }),
     };
 
     Object.assign(patient, updateData);
@@ -57,10 +62,10 @@ export class PatientsService {
 
   async remove(id: number): Promise<void> {
     const patient = await this.findOne(id);
-    
+
     // First, delete all related assignments
     await this.assignmentsRepository.delete({ patientId: id });
-    
+
     // Then delete the patient
     await this.patientsRepository.remove(patient);
   }
