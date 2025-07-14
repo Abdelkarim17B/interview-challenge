@@ -1,8 +1,8 @@
 # Oxyera Technical Challenge - Submission
 
 ## Live Demo
-**Repository**: https://github.com/Abdelkarim17B/interview-challenge
-**Live Demo**: https://9c00c0b6e663.ngrok-free.app
+- **Repository**: https://github.com/Abdelkarim17B/interview-challenge
+- **Live Demo**: https://9c00c0b6e663.ngrok-free.app
 
 ## Challenge Requirements
 
