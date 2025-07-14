@@ -161,9 +161,9 @@ npm run test:cov      # Coverage report
 ```
 
 ## Development Timeline
-**Duration**: 8 hours (1:00 AM - 9:00 PM GMT+1)
-**Date**: July 14, 2025
-**Ai Usage**: Mainly for repetitive tasks like writing boilerplate code, setting up configurations, and generating test cases.
+- **Duration**: ~~ 8 hours (1:00 AM - 9:00 PM GMT+1)
+- **Date**: July 14, 2025
+- **Ai Usage**: Mainly for repetitive tasks like writing boilerplate code, setting up configurations, and generating test cases.
 
 ## Technologies Used
 
