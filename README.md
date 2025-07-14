@@ -1,10 +1,10 @@
 # Oxyera Technical Challenge - Submission
 
-## 🚀 Live Demo
-**Frontend**: https://9c00c0b6e663.ngrok-free.app/  
-**API Documentation**: https://9c00c0b6e663.ngrok-free.app/api-docs (Swagger)
+## Live Demo
+**Repository**: https://github.com/Abdelkarim17B/interview-challenge
+**Live Demo**: https://9c00c0b6e663.ngrok-free.app
 
-## 📋 Challenge Requirements
+## Challenge Requirements
 
 ### NestJS Backend with CRUD Endpoints
 - **Patients**: Full CRUD operations (`/patients`)
