@@ -133,7 +133,7 @@ jobs:
         if: matrix.test-type == 'integration'
         run: |
           cd backend
-          npm run test -- --testPathPattern=integration.spec.ts
+          npm run test:e2e -- --testPathPattern=integration.spec.ts
 
       - name: Run E2E Tests
         if: matrix.test-type == 'e2e'
