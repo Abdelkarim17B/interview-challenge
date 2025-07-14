@@ -1,113 +1,216 @@
-# 🚀 Oxyera Async Interview Challenge
+# Oxyera Technical Challenge - Submission
 
-Hi! 👋 Welcome to the Oxyera async technical challenge. This test will help us evaluate your independence, code quality, organization, and technical decisions without ambiguity, so you can focus on delivering your best work.
+## 🚀 Live Demo
+**Frontend**: https://9c00c0b6e663.ngrok-free.app/  
+**API Documentation**: https://9c00c0b6e663.ngrok-free.app/api-docs (Swagger)
 
----
+## 📋 Challenge Requirements
 
-## 🎯 The Challenge
+### NestJS Backend with CRUD Endpoints
+- **Patients**: Full CRUD operations (`/patients`)
+- **Medications**: Full CRUD operations (`/medications`) 
+- **Assignments**: Full CRUD operations (`/assignments`)
+- RESTful API design with proper HTTP status codes
+- Input validation with DTOs and class-validator
+- Global error handling and response formatting
 
-### 📝 Description
+### Calculation Endpoint for Remaining Days
+- **Endpoint**: `GET /assignments/:id/remaining-days`
+- **Logic**: Calculates remaining treatment days based on start date and duration
+- Handles edge cases (completed treatments, future treatments)
+- Returns negative values for overdue treatments
 
-In this async challenge, you will build a full-stack mini-app to manage patients, medications, and their treatment assignments for a digital health workflow.
+### Next.js Frontend
+- **Tech Stack**: Next.js with TypeScript and Tailwind CSS
+- **Features**:
+  - Patient management interface
+  - Medication management interface  
+  - Assignment management with remaining days calculation
+  - Responsive design with modern UI components
+  - Real-time data fetching and updates
 
-You will implement CRUD APIs using NestJS with a SQLite database (already configured) and a minimal Next.js frontend to interact with these APIs. A patient can have multiple medication assignments, and you will implement logic to calculate the remaining days of each treatment automatically.
+### Unit Tests for Calculation Logic
+- **Coverage**: 83 comprehensive unit tests across all services and controllers
+- **Test Types**: Unit tests, Integration tests, E2E tests, Database tests
+- **Framework**: Jest with TypeScript
+- **Coverage**: 100% coverage on calculation logic and core business functions
 
-The goal is to evaluate your ability to:
+## Architecture & Implementation
 
-- Deliver clear, scalable, maintainable code.
+### Backend (NestJS)
+```
+src/
+├── modules/
+│   ├── patients/          # Patient management
+│   ├── medications/       # Medication management
+│   └── assignments/       # Assignment management & calculations
+├── common/
+│   ├── filters/          # Global exception handling
+│   └── interceptors/     # Response formatting
+└── database/             # SQLite configuration
+```
 
-- Handle clean API design and testing.
+**Key Features**:
+- TypeORM with SQLite database
+- Swagger API documentation
+- Global validation pipes
+- Custom exception filters
+- Response interceptors for consistent API responses
+- CORS configuration for frontend integration
 
-- Build a simple, functional UI connected to your backend.
+### Frontend (Next.js)
+```
+src/
+├── components/
+│   ├── pages/            # Page-specific components
+│   ├── ui/              # Reusable UI components
+│   └── layout/          # Layout components
+├── hooks/               # Custom React hooks
+├── lib/                 # API client and utilities
+└── types/               # TypeScript interfaces
+```
 
-- Manage your workflow independently with clear commits.
+**Key Features**:
+- TypeScript for type safety
+- Custom hooks for data fetching
+- Responsive design with Tailwind CSS
+- Form validation and error handling
+- Real-time data updates
 
-This test simulates real work at Oxyera: you will receive a task, execute it end-to-end, and submit it for review, demonstrating your ownership and technical skills without requiring continuous oversight.
+## Technical Enhancements
 
-### ✅ What will you implement 
+### Beyond Requirements
+I implemented several additional features to demonstrate production ready development practices:
 
-✅ **Backend (NestJS, runs on port **`8080`**)**
+#### CI/CD Pipeline (GitHub Actions)
+- **Pre-Build Stage**: Dependency installation and caching
+- **Code Quality**: ESLint, TypeScript checking, Prettier formatting
+- **Security**: npm audit, Dependabot automation
+- **Testing**: Unit, Integration, E2E, and Database tests
+- **Containerization**: Docker multi-stage builds
+- **Performance Monitoring**: Artillery load testing
+- **Deployment**: Automated staging deployment
 
-- CRUD endpoints for:
-  - `Patient` (name, date of birth)
-  - `Medication` (name, dosage, frequency)
-  - `Assignment` (assign a medication to a patient with a start date and number of days)
-- **A patient can have multiple medication assignments**.
-- Endpoint to calculate and return **remaining days of treatment** for each assignment (based on start date + days - today).
-- Endpoints should:
-  - Return clear, structured JSON.
-  - Validate input (e.g., required fields, valid dates).
-  - Return appropriate HTTP status codes.
-  - Be covered with at least **one unit test for calculation logic**.
+#### Docker Containerization
+- Multi-stage builds for optimized production images
+- Security hardening with non-root users
+- Health checks for container monitoring
+- Alpine Linux base for minimal image size
 
-✅ **Frontend (Next.js, runs on port **`3000`**)**
+#### Comprehensive Testing
+- **83 tests** covering all endpoints and business logic
+- Unit tests for services and controllers
+- Integration tests for API endpoints
+- E2E tests for complete user flows
+- Database connection tests
 
-- Multiple pages with Tailwind for styling.
-- Features:
-  - List patients with their assignments and remaining treatment days.
-  - Forms to create:
-    - Patients
-    - Medications
-    - Assign medications to patients.
-- Display **remaining treatment days clearly per assignment**.
-- Use a **global constant for backend URL** for clarity.
+#### Security & Best Practices
+- Input validation and sanitization
+- Global exception handling
+- CORS configuration
+- TypeScript strict mode
+- ESLint and Prettier for code quality
 
-✅ Use the **SQLite DB already configured in** `/backend/database.sqlite`.
+## Database Schema
 
-✅ Commit clearly and progressively, showing your reasoning in your commit messages.
+### Entities
+- **Patient**: `id`, `name`, `dateOfBirth`, `createdAt`, `updatedAt`
+- **Medication**: `id`, `name`, `dosage`, `frequency`, `createdAt`, `updatedAt`
+- **Assignment**: `id`, `patientId`, `medicationId`, `startDate`, `days`, `createdAt`, `updatedAt`
 
-✅ Use **TypeScript** everywhere.
+### Relationships
+- One-to-Many: Patient → Assignments
+- One-to-Many: Medication → Assignments
+- Many-to-One: Assignment → Patient, Medication
 
-✅ Structure your code cleanly to reflect scalability.
+## Getting Started
 
----
+### Prerequisites
+- Node.js 20+
+- npm or yarn
 
-## ⚡ What We’re Evaluating
-
-- Clear and scalable folder structure.
-- Proper API design and HTTP handling.
-- Input validation and error handling.
-- Consistent, readable code.
-- Use of TypeScript types for safety.
-- Test quality and coverage of core logic.
-- Ability to deliver a working feature with clean commits.
-- UI clarity and correct functional connection with your backend.
-
----
-
-## 🚀 Running the Project
-
-**Backend:**
-
+### Local Development
 ```bash
+# Backend
 cd backend
 npm install
 npm run start:dev
-```
 
-Access on `http://localhost:8080`.
-
-**Frontend:**
-
-```bash
+# Frontend  
 cd frontend
 npm install
 npm run dev
 ```
 
-Access on `http://localhost:3000`.
+### Docker Deployment
+```bash
+# Build and run with Docker
+docker build -t backend -f backend/Dockerfile backend/
+docker build -t frontend -f frontend/Dockerfile frontend/
 
-The SQLite database is located at `backend/database.sqlite`.
+docker run -p 8080:8080 backend
+docker run -p 3000:3000 frontend
+```
+
+### Running Tests
+```bash
+cd backend
+npm test              # Unit tests
+npm run test:e2e      # E2E tests
+npm run test:cov      # Coverage report
+```
+
+## Development Timeline
+**Duration**: 8 hours (1:00 AM - 9:00 PM GMT+1)
+**Date**: July 14, 2025
+**Ai Usage**: Mainly for repetitive tasks like writing boilerplate code, setting up configurations, and generating test cases.
+
+## Technologies Used
+
+### Backend
+- NestJS with TypeScript
+- TypeORM with SQLite
+- Class Validator for DTOs
+- Swagger for API documentation
+- Jest for testing
+
+### Frontend
+- Next.js with TypeScript
+- Tailwind CSS for styling
+- Custom hooks for state management
+- Responsive design principles
+
+### DevOps
+- GitHub Actions for CI/CD
+- Docker for containerization
+- Artillery for performance testing
+- ESLint + Prettier for code quality
+
+## Key Metrics
+- **83 tests** with full coverage
+- **0 ESLint errors** (strict TypeScript)
+- **Docker optimized** builds
+- **CI/CD pipeline** with 7 stages
+- **Production-ready** architecture
+
+## Business Logic Highlight
+
+The core calculation logic handles various scenarios:
+```typescript
+// Remaining days calculation
+const daysSinceStart = Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+const remainingDays = assignment.days - daysSinceStart;
+```
+
+**Edge Cases Handled**:
+- Future treatments (shows total days)
+- Ongoing treatments (shows remaining days)
+- Completed treatments (shows negative/overdue days)
+- Invalid dates and data validation
 
 ---
 
-## 📩 Submission
+**Repository**: https://github.com/Abdelkarim17B/interview-challenge
+**Live Demo**: https://9c00c0b6e663.ngrok-free.app/
 
-✅ Complete by one week after you recieved the assignment. 
-
-✅ Push to your your personal forked repo. 
-
-✅ Email your repo link to [dev@oxyera.com](mailto\:dev@oxyera.com).
-
-Thank you for your interest in Oxyera. We look forward to reviewing your structured, clear, and working solution!
-
+**Author**: Abdelkarim Bengherbia
